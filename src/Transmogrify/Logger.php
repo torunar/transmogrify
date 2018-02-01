@@ -4,6 +4,24 @@ namespace Transmogrify;
 
 class Logger
 {
+    /** @var bool|resource $stream */
+    protected $stream;
+
+    /**
+     * Logger constructor.
+     *
+     * @param string $destination Output destination: file path or std stream
+     */
+    public function __construct($destination = 'php://stdout')
+    {
+        $this->stream = fopen($destination, 'w');
+    }
+
+    public function __destruct()
+    {
+        fclose($this->stream);
+    }
+
     /**
      * Prints progress for the entity transference.
      *
@@ -18,21 +36,33 @@ class Logger
         ));
     }
 
-    public function add($string, $include_date = true)
+    /**
+     * Prints single log message.
+     *
+     * @param string $message      Message
+     * @param bool   $include_date Whether to include date into output
+     */
+    public function add($message, $include_date = true)
     {
         $date = '';
         if ($include_date) {
             $date = sprintf("[%s]\t", date('Y-m-d H:i:s'));
         }
-        printf("%s%s\n", $date, $string);
+
+        fwrite($this->stream, sprintf("%s%s\n", $date, $message));
     }
 
     /**
      * var_dump's passed values and dies.
      */
-    function dump()
+    public function dump()
     {
-        call_user_func_array('var_dump', func_get_args());
+        $message = [];
+        foreach (func_get_args() as $arg) {
+            $message[] = var_export($arg, true);
+        }
+
+        $this->add(implode(PHP_EOL, $message));
 
         exit(-1);
     }

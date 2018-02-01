@@ -67,6 +67,7 @@ class Ipb
             sprintf(
                 'SELECT tid AS id, starter_id AS user_id, start_date, forum_id, title FROM cftopics'
                 . ' WHERE forum_id = %d'
+                . ' ORDER BY start_date DESC'
                 . ' %s',
                 $forumId,
                 $limit
