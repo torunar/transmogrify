@@ -6,12 +6,19 @@ use Exception;
 
 class Ipb
 {
+    /** @var \mysqli $db */
     protected $db;
+
+    /** @var string $prefix */
+    protected $prefix;
+
+    /** @var string $tablePrefix */
+    protected $tablePrefix = 'cf';
 
     /**
      * Ipb constructor.
      *
-     * @param array $connectionSettings
+     * @param array $connectionSettings Database connection properties: host, username, password, name
      *
      * @throws \Exception
      */
@@ -45,7 +52,8 @@ class Ipb
     {
         return $this->db->query(
             sprintf(
-                'SELECT id, name FROM cfforums %s',
+                'SELECT id, name FROM %sforums %s',
+                $this->tablePrefix,
                 $forumsIds
                     ? sprintf('WHERE id IN (%s)', implode(',', $forumsIds))
                     : ''
@@ -65,14 +73,13 @@ class Ipb
     {
         return $this->db->query(
             sprintf(
-                'SELECT tid AS id, starter_id AS user_id, start_date, forum_id, title FROM cftopics'
+                'SELECT tid AS id, starter_id AS user_id, start_date, forum_id, title FROM %stopics'
                 . ' WHERE forum_id = %d'
                 . ' ORDER BY start_date DESC'
                 . ' %s',
+                $this->tablePrefix,
                 $forumId,
-                $limit
-                    ? "LIMIT {$limit}"
-                    : ''
+                $this->limit($limit)
             )
         );
     }
@@ -89,14 +96,13 @@ class Ipb
     {
         return $this->db->query(
             sprintf(
-                'SELECT author_id AS user_id, post, post_date FROM cfposts'
+                'SELECT author_id AS user_id, post, post_date FROM %sposts'
                 . ' WHERE topic_id = %d'
                 . ' ORDER BY post_date ASC'
                 . ' %s',
+                $this->tablePrefix,
                 $topicId,
-                $limit
-                    ? "LIMIT {$limit}"
-                    : ''
+                $this->limit($limit)
             )
         );
     }
@@ -112,12 +118,29 @@ class Ipb
     {
         $query = $this->db->query(
             sprintf(
-                'SELECT member_id AS id, name, members_display_name, email FROM cfmembers'
+                'SELECT member_id AS id, name, members_display_name, email FROM %smembers'
                 . ' WHERE member_id = %d',
+                $this->tablePrefix,
                 $userId
             )
         );
 
         return $query->fetch_assoc();
+    }
+
+    /**
+     * Provides limit expression for SQL query.
+     *
+     * @param int|null $limit Amount of objects
+     *
+     * @return string
+     */
+    protected function limit($limit = null)
+    {
+        if ((int) $limit > 0) {
+            return sprintf('LIMIT %d', $limit);
+        }
+
+        return '';
     }
 }

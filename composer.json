@@ -9,7 +9,7 @@
     ],
     "require": {},
     "autoload": {
-        "psr-0": {"Transmogrify\\": "src/"}
+        "psr-0": {"Transmogrify\\": ["src/overrides/", "src/"]}
     },
     "bin": ["bin/transmogrify"]
 }
