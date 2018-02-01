@@ -1,0 +1,15 @@
+{
+    "name": "torunar/transmogrify",
+    "description": "Migrates users, forums, topics, posts from an Invision Community (IP.Board) forum to a Discourse one using the Discourse API.",
+    "authors": [
+        {
+            "name": "Mike Schekotov",
+            "email": "torunar@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-0": {"Transmogrify\\": "src/"}
+    },
+    "bin": ["bin/transmogrify"]
+}
