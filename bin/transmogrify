@@ -82,8 +82,8 @@ while ($forum = $forumsQuery->fetch_assoc()) {
 
                 $topicId = $respDecoded['topic_id'];
 
-                $logger->setProgress('Topics', ++$topicsCounter, $topicsQuery->num_rows);
-                $logger->setProgress('Posts', ++$postsCounter, $postsQuery->num_rows);
+                $logger->setProgress("\tTopics", ++$topicsCounter, $topicsQuery->num_rows);
+                $logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
 
                 continue;
             }
@@ -96,7 +96,7 @@ while ($forum = $forumsQuery->fetch_assoc()) {
                 $logger->dump($e->getMessage(), $postData);
             }
 
-            $logger->setProgress('Posts', ++$postsCounter, $postsQuery->num_rows);
+            $logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
         }
     }
 }
