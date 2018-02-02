@@ -97,7 +97,7 @@ class Ipb
         return $this->db->query(
             sprintf(
                 'SELECT author_id AS user_id, post, post_date FROM %sposts'
-                . ' WHERE topic_id = %d'
+                . ' WHERE topic_id = %d AND pdelete_time = 0'
                 . ' ORDER BY post_date ASC'
                 . ' %s',
                 $this->tablePrefix,
