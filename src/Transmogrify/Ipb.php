@@ -116,6 +116,15 @@ class Ipb
      */
     public function getUser($userId)
     {
+        if ($userId == 0) {
+            return [
+                'id'                   => 0,
+                'name'                 => 'guest',
+                'members_display_name' => 'guest',
+                'email'                => 'guest@example.com',
+            ];
+        }
+
         $query = $this->db->query(
             sprintf(
                 'SELECT member_id AS id, name, members_display_name, email FROM %smembers'

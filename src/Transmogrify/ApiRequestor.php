@@ -47,7 +47,7 @@ class ApiRequestor
     public function request($method, $data = [], $requestMethod = 'post', $username = 'system')
     {
         if (++$this->callCount % 5 === 0) {
-            $this->logger->add("...lounge music plays...");
+            $this->logger->add("...");
             sleep($this->loungeDelay);
         }
 
