@@ -36,7 +36,7 @@ class Formatter
     {
         return [
             'name'     => $user['members_display_name'],
-            'email'    => $user['id'] . '@example.com',
+            'email'    => $user['email'],
             'password' => md5(openssl_random_pseudo_bytes(12)),
             'username' => $this->toUsername($user['name']),
             'active'   => true,

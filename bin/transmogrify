@@ -22,7 +22,7 @@ try {
     $logger->dump($e->getMessage(), $dbSettings);
 }
 
-$api = new Transmogrify\ApiRequestor($discourseAddress, $apiKey, $logger);
+$api = new Transmogrify\ApiRequestor($discourseAddress, $apiKey);
 $formatter = new Transmogrify\Formatter();
 
 $usersConversionMap = [];

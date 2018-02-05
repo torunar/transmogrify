@@ -16,39 +16,41 @@ class ApiRequestor
     /** @var int $callCount */
     protected $callCount = 0;
 
-    /** @var Logger $logger */
-    protected $logger;
+    /** @var string $defaultUsername */
+    protected $defaultUsername = 'system';
 
     /**
      * DiscourseApi constructor.
      *
-     * @param string  $address Discourse instance net address
-     * @param string  $apiKey  API key
-     * @param Logger $logger  Logger instance
+     * @param string $address Discourse instance net address
+     * @param string $apiKey  API key
      */
-    public function __construct($address, $apiKey, Logger $logger)
+    public function __construct($address, $apiKey)
     {
         $this->address = $address;
         $this->apiKey = $apiKey;
-        $this->logger = $logger;
     }
 
     /**
      * Performs API request to Discourse instance.
      *
-     * @param string $method        API method to request
-     * @param array  $data          Data to send in request
-     * @param string $requestMethod Request method (get, post)
-     * @param string $username      Username to perform request with
+     * @param string      $method        API method to request
+     * @param array       $data          Data to send in request
+     * @param string      $requestMethod Request method (get, post)
+     * @param string|null $username      Username to perform request with.
+     *                                   null to use default username
      *
      * @return array Decoded and raw response
      * @throws \Exception
      */
-    public function request($method, $data = [], $requestMethod = 'post', $username = 'system')
+    public function request($method, $data = [], $requestMethod = 'post', $username = null)
     {
         if (++$this->callCount % 5 === 0) {
-            $this->logger->add("...");
             sleep($this->loungeDelay);
+        }
+
+        if ($username === null) {
+            $username = $this->defaultUsername;
         }
 
         $url = $this->getUrl($method, $username);

@@ -1,6 +1,6 @@
 {
     "name": "torunar/transmogrify",
-    "description": "Migrates users, forums, topics, posts from an Invision Community (IP.Board) forum to a Discourse one using the Discourse API.",
+    "description": "Transmogrify allows you to transfer your InVision (ex. IP.Board) forum to the Discourse forum",
     "authors": [
         {
             "name": "Mike Schekotov",
@@ -9,7 +9,7 @@
     ],
     "require": {},
     "autoload": {
-        "psr-0": {"Transmogrify\\": ["src/overrides/", "src/"]}
+        "psr-4": {"Transmogrify\\": ["src/overrides/", "src/"]}
     },
     "bin": ["bin/transmogrify"]
 }
