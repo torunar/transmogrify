@@ -62,12 +62,13 @@ $ php ./bin/transmogrify dbHost dbUser dbPassword dbName apiKey [discourseAddres
 ```
 
 Arguments:
-- `dbHost` — database host of your InVision forum.
-- `dbUser` — database user.
-- `dbPassword` — database password.
-- `dbName` — database name.
-— `apiKey` — API key for the Discourse forum.
-- `discourseAddress` — network address of the Discourse forum (default: `http://localhost:4000`).
-- `forumIds` — comma-separated list of forum IDs to transfer (e.g. `10,12,13,25,42`).
-- `topicsLimit` — max amount of topics per forum to transfer.
-- `postsLimit` — max amount of posts per topic to transfer.
+
+* `dbHost` — database host of your InVision forum.
+* `dbUser` — database user.
+* `dbPassword` — database password.
+* `dbName` — database name.
+* `apiKey` — API key for the Discourse forum.
+* `discourseAddress` — network address of the Discourse forum (default: `http://localhost:4000`).
+* `forumIds` — comma-separated list of forum IDs to transfer (e.g. `10,12,13,25,42`).
+* `topicsLimit` — max amount of topics per forum to transfer.
+* `postsLimit` — max amount of posts per topic to transfer.
