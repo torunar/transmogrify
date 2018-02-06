@@ -12,15 +12,17 @@ class ArgsParser
 
     protected $dbName = 4;
 
-    protected $apiKey = 5;
+    protected $dbPrefix = 5;
 
-    protected $discourseAddress = 6;
+    protected $apiKey = 6;
 
-    protected $forumIds = 7;
+    protected $discourseAddress = 7;
 
-    protected $topicsLimit = 8;
+    protected $forumIds = 8;
 
-    protected $postsLimit = 9;
+    protected $topicsLimit = 9;
+
+    protected $postsLimit = 10;
 
     /**
      * ArgsParser constructor.
@@ -33,7 +35,7 @@ class ArgsParser
     {
         if ($argc < ($this->apiKey + 1)) {
             throw new \Exception(
-                "Usage:\tphp transmogrify dbHost dbUser dbPassword dbName apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]"
+                "Usage:\tphp transmogrify dbHost dbUser dbPassword dbName dbPrefix apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]"
             );
         }
     }
@@ -52,9 +54,10 @@ class ArgsParser
             'username' => $argv[$this->dbUsername],
             'password' => $argv[$this->dbPassword],
             'name'     => $argv[$this->dbName],
+            'prefix'   => $argv[$this->dbPrefix],
         ];
 
-        $apiKey = $argv[5];
+        $apiKey = $argv[$this->apiKey];
 
         $discourseAddress = isset($argv[$this->discourseAddress])
             ? $argv[$this->discourseAddress]

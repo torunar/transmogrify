@@ -58,15 +58,16 @@ $ composer install
 
 Run the tool:
 ```
-$ php ./bin/transmogrify dbHost dbUser dbPassword dbName apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]
+$ php ./bin/transmogrify dbHost dbUser dbPassword dbName dbPrefix apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]
 ```
 
 Arguments:
 
 * `dbHost` — database host of your InVision forum.
 * `dbUser` — database user.
-* `dbPassword` — database password.
+* `dbPassword` — database password (`""` or `''` must be specified for the empty password).
 * `dbName` — database name.
+* `dbPrefix` — table prefix (`""` or `''` must be specified for the empty prefix).
 * `apiKey` — API key for the Discourse forum.
 * `discourseAddress` — network address of the Discourse forum (default: `http://localhost:4000`).
 * `forumIds` — comma-separated list of forum IDs to transfer (e.g. `10,12,13,25,42`).

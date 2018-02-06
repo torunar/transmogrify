@@ -12,9 +12,6 @@ class Ipb
     /** @var string $prefix */
     protected $prefix;
 
-    /** @var string $tablePrefix */
-    protected $tablePrefix = 'cf';
-
     /**
      * Ipb constructor.
      *
@@ -30,6 +27,8 @@ class Ipb
             $connectionSettings['password'],
             $connectionSettings['name']
         );
+
+        $this->prefix = $connectionSettings['prefix'];
 
         if (!$this->db) {
             throw new Exception('DB connection failed');
@@ -53,7 +52,7 @@ class Ipb
         return $this->db->query(
             sprintf(
                 'SELECT id, name FROM %sforums %s',
-                $this->tablePrefix,
+                $this->prefix,
                 $forumsIds
                     ? sprintf('WHERE id IN (%s)', implode(',', $forumsIds))
                     : ''
@@ -77,7 +76,7 @@ class Ipb
                 . ' WHERE forum_id = %d'
                 . ' ORDER BY start_date DESC'
                 . ' %s',
-                $this->tablePrefix,
+                $this->prefix,
                 $forumId,
                 $this->limit($limit)
             )
@@ -100,7 +99,7 @@ class Ipb
                 . ' WHERE topic_id = %d AND pdelete_time = 0'
                 . ' ORDER BY post_date ASC'
                 . ' %s',
-                $this->tablePrefix,
+                $this->prefix,
                 $topicId,
                 $this->limit($limit)
             )
@@ -129,7 +128,7 @@ class Ipb
             sprintf(
                 'SELECT member_id AS id, name, members_display_name, email FROM %smembers'
                 . ' WHERE member_id = %d',
-                $this->tablePrefix,
+                $this->prefix,
                 $userId
             )
         );
