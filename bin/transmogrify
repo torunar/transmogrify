@@ -3,27 +3,33 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Transmogrify\Logger;
+use Transmogrify\ArgsParser;
+use Transmogrify\Ipb;
+use Transmogrify\ApiRequestor;
+use Transmogrify\Formatter;
+
 date_default_timezone_set('UTC');
 
-$logger = new Transmogrify\Logger();
+$logger = new Logger();
 
 try {
-    $argsParser = new Transmogrify\ArgsParser($argc);
+    $argsParser = new ArgsParser($argc);
 } catch (Exception $e) {
     $logger->add($e->getMessage(), false);
     exit(-1);
 }
 
-list($dbSettings, $apiKey, $discourseAddress, $forumsIds, $topicsLimit, $postsLimit) = $argsParser->parse($argv);
+list($dbSettings, $ipbAddress, $apiKey, $discourseAddress, $forumsIds, $topicsLimit, $postsLimit) = $argsParser->parse($argv);
 
 try {
-    $ipb = new Transmogrify\Ipb($dbSettings);
+    $ipb = new Ipb($dbSettings, $ipbAddress);
 } catch (Exception $e) {
     $logger->dump($e->getMessage(), $dbSettings);
 }
 
-$api = new Transmogrify\ApiRequestor($discourseAddress, $apiKey);
-$formatter = new Transmogrify\Formatter();
+$api = new ApiRequestor($discourseAddress, $apiKey);
+$formatter = new Formatter();
 
 $usersConversionMap = [];
 
@@ -53,6 +59,8 @@ while ($forum = $forumsQuery->fetch_assoc()) {
         $postsCounter = 0;
         while ($post = $postsQuery->fetch_assoc()) {
 
+            $attachments = $ipb->getAttachments($post['id']);
+
             if (!isset($usersConversionMap[$post['user_id']])) {
 
                 $user = $ipb->getUser($post['user_id']);
@@ -60,7 +68,7 @@ while ($forum = $forumsQuery->fetch_assoc()) {
                 $userData = $formatter->toUser($user);
 
                 try {
-                    list($respDecoded,) = $api->request('users', $userData);
+                    $api->request('users', $userData);
                 } catch (Exception $e) {
                     $logger->dump($e->getMessage(), $userData);
                 }
@@ -72,7 +80,7 @@ while ($forum = $forumsQuery->fetch_assoc()) {
 
             if ($postsCounter === 0) {
 
-                $topicData = $formatter->toTopic($categoryId, $topic, $post);
+                $topicData = $formatter->toTopic($categoryId, $topic, $post, $attachments);
 
                 try {
                     list($respDecoded,) = $api->request('posts', $topicData, 'post', $username);
@@ -88,7 +96,7 @@ while ($forum = $forumsQuery->fetch_assoc()) {
                 continue;
             }
 
-            $postData = $formatter->toPost($topicId, $post);
+            $postData = $formatter->toPost($topicId, $post, $attachments);
 
             try {
                 $api->request('posts', $postData, 'post', $username);

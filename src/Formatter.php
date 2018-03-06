@@ -47,34 +47,44 @@ class Formatter
     /**
      * Converts IPB topic to Discourse API data.
      *
-     * @param int   $categoryId Discourse category ID
-     * @param array $topic      IPB topic data
-     * @param array $post       IPB OP data
+     * @param int   $categoryId  Discourse category ID
+     * @param array $topic       IPB topic data
+     * @param array $post        OP data
+     * @param array $attachments OP attachments
      *
      * @return array
      */
-    public function toTopic($categoryId, array $topic, array $post)
+    public function toTopic($categoryId, array $topic, array $post, array $attachments = [])
     {
-        return [
-            'title'      => html_entity_decode($topic['title']),
-            'raw'        => html_entity_decode($post['post']),
-            'category'   => $categoryId,
-            'created_at' => $this->toDate($post['post_date']),
-        ];
+        $openingPost = $this->toPost(0, $post, $attachments);
+        $openingPost['title'] = html_entity_decode($topic['title']);
+        $openingPost['category'] = $categoryId;
+        unset($openingPost['topic_id']);
+
+        return $openingPost;
     }
 
     /**
      * Converts IPB post to Discourse API data.
      *
-     * @param int   $topicId Discourse topic ID
-     * @param array $post    IPB post data
+     * @param int   $topicId     Discourse topic ID
+     * @param array $post        IPB post data
+     * @param array $attachments Post attachments
      *
      * @return array
      */
-    public function toPost($topicId, array $post)
+    public function toPost($topicId, array $post, array $attachments = [])
     {
+        $text = $post['post'];
+
+        foreach ($attachments as $attachment) {
+            $text .= $this->toAttachment($attachment);
+        }
+
+        $text = $this->replacePlaceholders($text);
+
         return [
-            'raw'        => html_entity_decode($post['post']),
+            'raw'        => html_entity_decode($text),
             'topic_id'   => $topicId,
             'created_at' => $this->toDate($post['post_date']),
         ];
@@ -118,5 +128,35 @@ class Formatter
     function toDate($timestamp)
     {
         return date('Y-m-d', $timestamp);
+    }
+
+    /**
+     * Converts IPB attachment to attachment link.
+     *
+     * @param array $attachment IPB attachment (must contain `name` and `location`)
+     *
+     * @return string Attachment link
+     */
+    protected function toAttachment(array $attachment)
+    {
+        return sprintf(
+            '<p><a href="%s">%s</a></p>',
+            $attachment['location'],
+            $attachment['name']
+        );
+    }
+
+    /**
+     * Replaces some IPB variables in post text.
+     *
+     * @param string $text Post text
+     *
+     * @return string
+     */
+    protected function replacePlaceholders($text)
+    {
+        return strtr($text, [
+            '<#EMO_DIR#>' => 'default'
+        ]);
     }
 }

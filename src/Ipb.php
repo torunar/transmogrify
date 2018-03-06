@@ -12,14 +12,18 @@ class Ipb
     /** @var string $prefix */
     protected $prefix;
 
+    /** @var string $address */
+    protected $address;
+
     /**
      * Ipb constructor.
      *
-     * @param array $connectionSettings Database connection properties: host, username, password, name
+     * @param array  $connectionSettings Database connection properties: host, username, password, name
+     * @param string $address            Forum address (specified as schema://host/path)
      *
      * @throws \Exception
      */
-    public function __construct(array $connectionSettings)
+    public function __construct(array $connectionSettings, $address)
     {
         $this->db = @mysqli_connect(
             $connectionSettings['host'],
@@ -29,6 +33,8 @@ class Ipb
         );
 
         $this->prefix = $connectionSettings['prefix'];
+
+        $this->address = ltrim($address, '/');
 
         if (!$this->db) {
             throw new Exception('DB connection failed');
@@ -95,7 +101,7 @@ class Ipb
     {
         return $this->db->query(
             sprintf(
-                'SELECT author_id AS user_id, post, post_date FROM %sposts'
+                'SELECT pid AS id, author_id AS user_id, post, post_date FROM %sposts'
                 . ' WHERE topic_id = %d AND pdelete_time = 0'
                 . ' ORDER BY post_date ASC'
                 . ' %s',
@@ -150,5 +156,27 @@ class Ipb
         }
 
         return '';
+    }
+
+    /**
+     * Fetches post attachments.
+     *
+     * @param int $postId Post ID
+     *
+     * @return array
+     */
+    public function getAttachments($postId)
+    {
+        $query = $this->db->query(
+            sprintf(
+                "SELECT attach_file AS name, CONCAT('%s', '/uploads/', attach_location) AS location FROM %sattachments"
+                . " WHERE attach_rel_module = 'post' AND attach_rel_id = %d",
+                $this->address,
+                $this->prefix,
+                $postId
+            )
+        );
+
+        return $query->fetch_all(MYSQLI_ASSOC);
     }
 }

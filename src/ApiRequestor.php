@@ -27,7 +27,7 @@ class ApiRequestor
      */
     public function __construct($address, $apiKey)
     {
-        $this->address = $address;
+        $this->address = ltrim($address, '/');
         $this->apiKey = $apiKey;
     }
 
@@ -107,7 +107,7 @@ class ApiRequestor
     {
         return sprintf(
             '%s/%s.json?api_username=%s&api_key=%s',
-            rtrim($this->address, '/'),
+            $this->address,
             $method,
             $username,
             $this->apiKey
