@@ -3,110 +3,19 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Transmogrify\Logger;
-use Transmogrify\ArgsParser;
-use Transmogrify\Ipb;
-use Transmogrify\ApiRequestor;
-use Transmogrify\Formatter;
+use Transmogrify\ApiException;
+use Transmogrify\App;
 
 date_default_timezone_set('UTC');
 
-$logger = new Logger();
-
+$exitCode = -1;
 try {
-    $argsParser = new ArgsParser($argc);
+    $app = new App($argc, $argv);
+    $exitCode = $app->run();
+} catch (ApiException $e) {
+    $app->getLogger()->dump($e->getMessage(), $e->getData());
 } catch (Exception $e) {
-    $logger->add($e->getMessage(), false);
-    exit(-1);
+    echo $e->getMessage();
 }
 
-list($dbSettings, $ipbAddress, $apiKey, $discourseAddress, $forumsIds, $topicsLimit, $postsLimit) = $argsParser->parse($argv);
-
-try {
-    $ipb = new Ipb($dbSettings, $ipbAddress);
-} catch (Exception $e) {
-    $logger->dump($e->getMessage(), $dbSettings);
-}
-
-$api = new ApiRequestor($discourseAddress, $apiKey);
-$formatter = new Formatter();
-
-$usersConversionMap = [];
-
-$forumsQuery = $ipb->getForums($forumsIds);
-$forumsCounter = 0;
-while ($forum = $forumsQuery->fetch_assoc()) {
-
-    $forumData = $formatter->toForum($forum);
-
-    try {
-        list($respDecoded,) = $api->request('categories', $forumData);
-    } catch (Exception $e) {
-        $logger->dump($e->getMessage(), $forumData);
-    }
-
-    $categoryId = (int) $respDecoded['category']['id'];
-
-    $logger->setProgress('Forums', ++$forumsCounter, $forumsQuery->num_rows);
-
-    $topicsQuery = $ipb->getTopics($forum['id'], $topicsLimit);
-    $topicsCounter = 0;
-    while ($topic = $topicsQuery->fetch_assoc()) {
-
-        $topicId = null;
-
-        $postsQuery = $ipb->getPosts($topic['id'], $postsLimit);
-        $postsCounter = 0;
-        while ($post = $postsQuery->fetch_assoc()) {
-
-            $attachments = $ipb->getAttachments($post['id']);
-
-            if (!isset($usersConversionMap[$post['user_id']])) {
-
-                $user = $ipb->getUser($post['user_id']);
-
-                $userData = $formatter->toUser($user);
-
-                try {
-                    $api->request('users', $userData);
-                } catch (Exception $e) {
-                    $logger->dump($e->getMessage(), $userData);
-                }
-
-                $usersConversionMap[$user['id']] = $userData['username'];
-            }
-
-            $username = $usersConversionMap[$post['user_id']];
-
-            if ($postsCounter === 0) {
-
-                $topicData = $formatter->toTopic($categoryId, $topic, $post, $attachments);
-
-                try {
-                    list($respDecoded,) = $api->request('posts', $topicData, 'post', $username);
-                } catch (Exception $e) {
-                    $logger->dump($e->getMessage(), $topicData);
-                }
-
-                $topicId = $respDecoded['topic_id'];
-
-                $logger->setProgress("\tTopics", ++$topicsCounter, $topicsQuery->num_rows);
-                $logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
-
-                continue;
-            }
-
-            $postData = $formatter->toPost($topicId, $post, $attachments);
-
-            try {
-                $api->request('posts', $postData, 'post', $username);
-            } catch (Exception $e) {
-                $logger->dump($e->getMessage(), $postData);
-            }
-
-            $logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
-        }
-    }
-}
-
-exit(0);
+exit($exitCode);

@@ -59,12 +59,12 @@ class ArgsParser
             'prefix'   => $argv[$this->dbPrefix],
         ];
 
-        $ipbAddress = $argv[$this->ipbAddress];
+        $ipbAddress = rtrim($argv[$this->ipbAddress], '/');
 
         $apiKey = $argv[$this->apiKey];
 
         $discourseAddress = isset($argv[$this->discourseAddress])
-            ? $argv[$this->discourseAddress]
+            ? rtrim($argv[$this->discourseAddress], '/')
             : 'http://localhost:4000';
         $forumsIds = isset($argv[$this->forumIds])
             ? explode(',', $argv[$this->forumIds])

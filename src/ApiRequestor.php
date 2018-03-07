@@ -27,7 +27,7 @@ class ApiRequestor
      */
     public function __construct($address, $apiKey)
     {
-        $this->address = ltrim($address, '/');
+        $this->address = $address;
         $this->apiKey = $apiKey;
     }
 
@@ -41,7 +41,7 @@ class ApiRequestor
      *                                   null to use default username
      *
      * @return array Decoded and raw response
-     * @throws \Exception
+     * @throws \Transmogrify\ApiException
      */
     public function request($method, $data = [], $requestMethod = 'post', $username = null)
     {
@@ -78,18 +78,24 @@ class ApiRequestor
         curl_close($ch);
 
         if ($errorNumber) {
-            throw new \Exception($errorMessage, $errorNumber);
+            $exception = new ApiException($errorMessage, $errorNumber);
+            $exception->setData($data);
+            throw $exception;
         }
 
         $responseDecoded = json_decode($response, true);
 
         if ($responseDecoded === null) {
-            throw new \Exception($response);
+            $exception = new ApiException($response);
+            $exception->setData($data);
+            throw $exception;
         }
 
         if (!empty($responseDecoded['errors'])) {
             $errorText = $this->getErrors($responseDecoded['errors']);
-            throw new \Exception($errorText);
+            $exception = new ApiException($errorText);
+            $exception->setData($data);
+            throw $exception;
         }
 
         return array($responseDecoded, $response);

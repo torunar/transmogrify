@@ -53,7 +53,7 @@ class Logger
     }
 
     /**
-     * var_dump's passed values and dies.
+     * var_dump's passed values.
      */
     public function dump()
     {
@@ -63,7 +63,5 @@ class Logger
         }
 
         $this->add(implode(PHP_EOL, $message));
-
-        exit(-1);
     }
 }

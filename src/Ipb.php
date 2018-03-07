@@ -34,7 +34,7 @@ class Ipb
 
         $this->prefix = $connectionSettings['prefix'];
 
-        $this->address = ltrim($address, '/');
+        $this->address = $address;
 
         if (!$this->db) {
             throw new Exception('DB connection failed');
