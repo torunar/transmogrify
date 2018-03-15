@@ -37,7 +37,7 @@ class ArgsParser
     {
         if ($argc < ($this->apiKey + 1)) {
             throw new \Exception(
-                "Usage:\tphp transmogrify dbHost dbUser dbPassword dbName dbPrefix ipbAddress apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]"
+                "Usage:\tphp transmogrify dbHost dbUser dbPassword dbName dbPrefix ipbAddress apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]\n"
             );
         }
     }

@@ -75,7 +75,9 @@ class Formatter
      */
     public function toPost($topicId, array $post, array $attachments = [])
     {
-        $text = $post['post'];
+        $text = trim($post['post']);
+
+        $text = html_entity_decode($text);
 
         foreach ($attachments as $attachment) {
             $text .= $this->toAttachment($attachment);
@@ -83,8 +85,12 @@ class Formatter
 
         $text = $this->replacePlaceholders($text);
 
+        if ($this->isTypographical($text)) {
+            $text .= '&nbsp;';
+        }
+
         return [
-            'raw'        => html_entity_decode($text),
+            'raw'        => $text,
             'topic_id'   => $topicId,
             'created_at' => $this->toDate($post['post_date']),
         ];
@@ -156,7 +162,51 @@ class Formatter
     protected function replacePlaceholders($text)
     {
         return strtr($text, [
-            '<#EMO_DIR#>' => 'default'
+            '<#EMO_DIR#>' => 'default',
         ]);
+    }
+
+    /**
+     * Checks if text contains only typographical symbols.
+     *
+     * @param string $text
+     *
+     * @return false|int
+     */
+    protected function isTypographical($text)
+    {
+        $text = trim($text);
+
+        $typography = [
+            '!',
+            '@',
+            '#',
+            '$',
+            '%',
+            ':',
+            '^',
+            ';',
+            '*',
+            '(',
+            ')',
+            '[',
+            ']',
+            '{',
+            '}',
+            '<',
+            '>',
+            '-',
+            '_',
+            '=',
+            '+',
+            '`',
+            '~',
+            '.',
+            ',',
+            '/',
+            '\\',
+        ];
+
+        return (bool) preg_match('/^[\\' . implode('\\', $typography) . ']+$/', $text);
     }
 }

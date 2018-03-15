@@ -19,6 +19,9 @@ class ApiRequestor
     /** @var string $defaultUsername */
     protected $defaultUsername = 'system';
 
+    /** @var int $batchSize */
+    protected $batchSize = 10;
+
     /**
      * DiscourseApi constructor.
      *
@@ -45,7 +48,7 @@ class ApiRequestor
      */
     public function request($method, $data = [], $requestMethod = 'post', $username = null)
     {
-        if (++$this->callCount % 5 === 0) {
+        if (++$this->callCount % $this->batchSize === 0) {
             sleep($this->loungeDelay);
         }
 
@@ -77,9 +80,15 @@ class ApiRequestor
         $errorMessage = curl_exec($ch);
         curl_close($ch);
 
+        $debugData = [
+            'method' => $requestMethod,
+            'url'    => $url,
+            'data'   => $data,
+        ];
+
         if ($errorNumber) {
             $exception = new ApiException($errorMessage, $errorNumber);
-            $exception->setData($data);
+            $exception->setData($debugData);
             throw $exception;
         }
 
@@ -87,14 +96,14 @@ class ApiRequestor
 
         if ($responseDecoded === null) {
             $exception = new ApiException($response);
-            $exception->setData($data);
+            $exception->setData($debugData);
             throw $exception;
         }
 
         if (!empty($responseDecoded['errors'])) {
             $errorText = $this->getErrors($responseDecoded['errors']);
             $exception = new ApiException($errorText);
-            $exception->setData($data);
+            $exception->setData($debugData);
             throw $exception;
         }
 

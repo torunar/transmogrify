@@ -134,8 +134,8 @@ class App
 
                         $this->triggerEvent('postTopicCreated', $topic, $topicData, $respDecoded, $topicId);
 
-                        $this->logger->setProgress("\tTopics", ++$topicsCounter, $topicsQuery->num_rows);
-                        $this->logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
+                        $this->logger->setProgress('  Topics', ++$topicsCounter, $topicsQuery->num_rows);
+                        $this->logger->setProgress('    Posts', ++$postsCounter, $postsQuery->num_rows);
 
                         continue;
                     }
@@ -144,7 +144,7 @@ class App
 
                     $this->api->request('posts', $postData, 'post', $username);
 
-                    $this->logger->setProgress("\t\tPosts", ++$postsCounter, $postsQuery->num_rows);
+                    $this->logger->setProgress('    Posts', ++$postsCounter, $postsQuery->num_rows);
                 }
             }
         }

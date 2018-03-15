@@ -13,12 +13,14 @@ Before running a tool, the Discourse should be configured to minimise side effec
 Log in into your Discourse administration panel, go to the **Settings** tab and set the following settings accordingly:
 
 ```
+unique posts mins                   0
 rate limit create topic             0
 rate limit create post              0
 rate limit new user create topic    0
 rate limit new user create post     0
 max topics per day                  900000 (higher = better)
 max topics in first day             900000 (higher = better)
+max post length                     990000 (higher = better)
 
 newuser max replies per topic       100    (higher = better)
 newuser max mentions per post       100    (higher = better)
@@ -27,12 +29,14 @@ newuser max images                  100    (higher = better)
 newuser max attachments             5      (higher = better)
 newuser spam host threshold         30     (higher = better)
 
-min post length                     5       (lower = better)
-min first post length               5       (lower = better)
-body min entropy                    1
-title min entropy                   1
-min topic title length              3
-min title similar length            1024
+min post length                     1       (lower = better)
+min first post length               1       (lower = better)
+body min entropy                    1       (lower = better)
+title min entropy                   1       (lower = better)
+min topic title length              1       (lower = better)
+min title similar length            1024    (higher = better)
+
+default email direct                disable (prevents email notifications on @mentions)
 ```
 
 You will also need to create an API key to interact with your Discourse forum.
