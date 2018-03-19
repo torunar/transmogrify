@@ -18,16 +18,16 @@ rate limit create topic             0
 rate limit create post              0
 rate limit new user create topic    0
 rate limit new user create post     0
-max topics per day                  900000 (higher = better)
-max topics in first day             900000 (higher = better)
-max post length                     990000 (higher = better)
+max topics per day                  990000  (higher = better)
+max topics in first day             990000  (higher = better)
+max post length                     990000  (higher = better)
 
-newuser max replies per topic       100    (higher = better)
-newuser max mentions per post       100    (higher = better)
-newuser max links                   100    (higher = better)
-newuser max images                  100    (higher = better)
-newuser max attachments             5      (higher = better)
-newuser spam host threshold         30     (higher = better)
+newuser max replies per topic       100     (higher = better)
+newuser max mentions per post       100     (higher = better)
+newuser max links                   100     (higher = better)
+newuser max images                  100     (higher = better)
+newuser max attachments             5       (higher = better)
+newuser spam host threshold         30      (higher = better)
 
 min post length                     1       (lower = better)
 min first post length               1       (lower = better)

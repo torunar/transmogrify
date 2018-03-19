@@ -11,9 +11,11 @@ date_default_timezone_set('UTC');
 $exitCode = -1;
 try {
     $app = new App($argc, $argv);
+    $app->restoreState();
     $exitCode = $app->run();
 } catch (ApiException $e) {
     $app->getLogger()->dump($e->getMessage(), $e->getData());
+    $app->saveState();
 } catch (Exception $e) {
     echo $e->getMessage();
 }

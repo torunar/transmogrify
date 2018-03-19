@@ -43,6 +43,21 @@ class App
     /** @var string $discourseAddress */
     protected $discourseAddress;
 
+    /** @var array $usersConversionMap */
+    protected $usersConversionMap = [];
+
+    /** @var array $forumsConversionMap */
+    protected $forumsConversionMap = [];
+
+    /** @var array $topicsConversionMap */
+    protected $topicsConversionMap = [];
+
+    /** @var array $postsConversionMap */
+    protected $postsConversionMap = [];
+
+    /** @var bool $isStateRestored */
+    protected $isStateRestored = false;
+
     /**
      * App constructor.
      *
@@ -83,17 +98,19 @@ class App
     {
         $this->triggerEvent('preRun');
 
-        $usersConversionMap = [];
-
         $forumsQuery = $this->ipb->getForums($this->forumsIds);
         $forumsCounter = 0;
         while ($forum = $forumsQuery->fetch_assoc()) {
 
             $forumData = $this->formatter->toForum($forum);
 
-            list($respDecoded,) = $this->api->request('categories', $forumData);
+            $respDecoded = null;
+            if (!isset($this->forumsConversionMap[$forum['id']])) {
+                list($respDecoded,) = $this->api->request('categories', $forumData);
+                $this->forumsConversionMap[$forum['id']] = (int) $respDecoded['category']['id'];
+            }
 
-            $categoryId = (int) $respDecoded['category']['id'];
+            $categoryId = $this->forumsConversionMap[$forum['id']];
 
             $this->triggerEvent('postForumCreated', $forum, $forumData, $respDecoded, $categoryId);
 
@@ -111,26 +128,29 @@ class App
 
                     $attachments = $this->ipb->getAttachments($post['id']);
 
-                    if (!isset($usersConversionMap[$post['user_id']])) {
+                    $respDecoded = null;
+                    if (!isset($this->usersConversionMap[$post['user_id']])) {
 
                         $user = $this->ipb->getUser($post['user_id']);
-
                         $userData = $this->formatter->toUser($user);
 
-                        $this->api->request('users', $userData);
-
-                        $usersConversionMap[$user['id']] = $userData['username'];
+                        list($respDecoded,) = $this->api->request('users', $userData);
+                        $this->usersConversionMap[$user['id']] = $userData['username'];
                     }
 
-                    $username = $usersConversionMap[$post['user_id']];
+                    $username = $this->usersConversionMap[$post['user_id']];
 
                     if ($postsCounter === 0) {
 
                         $topicData = $this->formatter->toTopic($categoryId, $topic, $post, $attachments);
 
-                        list($respDecoded,) = $this->api->request('posts', $topicData, 'post', $username);
+                        $respDecoded = null;
+                        if (!isset($this->topicsConversionMap[$post['id']])) {
+                            list($respDecoded,) = $this->api->request('posts', $topicData, 'post', $username);
+                            $this->topicsConversionMap[$post['id']] = (int) $respDecoded['topic_id'];
+                        }
 
-                        $topicId = $respDecoded['topic_id'];
+                        $topicId = $this->topicsConversionMap[$post['id']];
 
                         $this->triggerEvent('postTopicCreated', $topic, $topicData, $respDecoded, $topicId);
 
@@ -142,12 +162,18 @@ class App
 
                     $postData = $this->formatter->toPost($topicId, $post, $attachments);
 
-                    $this->api->request('posts', $postData, 'post', $username);
+                    $respDecoded = null;
+                    if (!isset($this->postsConversionMap[$post['id']])) {
+                        list($respDecoded,) = $this->api->request('posts', $postData, 'post', $username);
+                        $this->postsConversionMap[$post['id']] = (int) $respDecoded['id'];
+                    }
 
                     $this->logger->setProgress('    Posts', ++$postsCounter, $postsQuery->num_rows);
                 }
             }
         }
+
+        $this->resetState();
 
         $this->triggerEvent('postRun');
 
@@ -184,5 +210,69 @@ class App
     public function getDiscourseAddress()
     {
         return $this->discourseAddress;
+    }
+
+    /**
+     * Provides path to a file to store application state in it.
+     *
+     * @return string
+     */
+    protected function getStatePath()
+    {
+        return __DIR__ . '/../var/app.stt';
+    }
+
+    /**
+     * Restores application state on startup.
+     */
+    public function restoreState()
+    {
+        $statePath = $this->getStatePath();
+
+        if (file_exists($statePath)) {
+            $state = require_once $statePath;
+            $this->forumsConversionMap = $state['forums'];
+            $this->topicsConversionMap = $state['topics'];
+            $this->postsConversionMap = $state['posts'];
+            $this->usersConversionMap = $state['users'];
+
+            $this->isStateRestored = true;
+        }
+    }
+
+    /**
+     * Saves application state on shutdown.
+     */
+    public function saveState()
+    {
+        $restore = [
+            'forums' => $this->forumsConversionMap,
+            'topics' => $this->topicsConversionMap,
+            'posts'  => $this->postsConversionMap,
+            'users'  => $this->usersConversionMap,
+        ];
+
+        $statePath = $this->getStatePath();
+        if (!is_dir(dirname($statePath))) {
+            mkdir(dirname($statePath));
+        }
+
+        $tpl = '<?php'
+            . ' $restore = %s;'
+            . ' return $restore;';
+
+        file_put_contents($statePath, sprintf($tpl, var_export($restore, 1)));
+    }
+
+    /**
+     * Clears stored application state.
+     */
+    protected function resetState()
+    {
+        $statePath = $this->getStatePath();
+
+        if (file_exists($statePath)) {
+            unlink($statePath);
+        }
     }
 }
