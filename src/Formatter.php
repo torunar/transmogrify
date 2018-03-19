@@ -111,14 +111,20 @@ class Formatter
 
         $username = $this->transliterator->transliterate($username);
 
-        $username = preg_replace('/[^a-z0-9_.-]+/i', '', $username);
-
         $username = strtolower($username);
 
+        // name can contain only alphanumerics, dots, dashes and underscores
+        $username = preg_replace('/[^a-z0-9_.-]+/i', '', $username);
+
+        // name must start with alphanumeric or underscore
+        $username = preg_replace('/^[^a-z0-9_]+/', '', $username);
+
+        // name must end with alphanumeric
         if (!preg_match('/[a-z0-9]$/i', $username)) {
-            $username .= (string) rand(0, 9);
+            $username = $this->randomizeUsername($username);
         }
 
+        // name must not contain consequential dots, dashes or underscores
         $username = preg_replace('/([_.-])+/', '$1', $username);
 
         return $username;
@@ -208,5 +214,19 @@ class Formatter
         ];
 
         return (bool) preg_match('/^[\\' . implode('\\', $typography) . ']+$/', $text);
+    }
+
+    /**
+     * Adds random number to the end of the username.
+     *
+     * @param string $username Username
+     *
+     * @return string
+     */
+    public function randomizeUsername($username)
+    {
+        $username .= (string) rand(0, 9);
+
+        return $username;
     }
 }

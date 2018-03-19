@@ -134,6 +134,16 @@ class App
                         $user = $this->ipb->getUser($post['user_id']);
                         $userData = $this->formatter->toUser($user);
 
+                        // check if username is already used
+                        $isValid = false;
+                        while (!$isValid) {
+                            $isValid = array_search($userData['username'], $this->usersConversionMap) === false;
+
+                            if (!$isValid) {
+                                $userData['username'] = $this->formatter->randomizeUsername($userData['username']);
+                            }
+                        }
+
                         list($respDecoded,) = $this->api->request('users', $userData);
                         $this->usersConversionMap[$user['id']] = $userData['username'];
                     }
@@ -172,8 +182,6 @@ class App
                 }
             }
         }
-
-        $this->resetState();
 
         $this->triggerEvent('postRun');
 
@@ -235,6 +243,7 @@ class App
             $this->topicsConversionMap = $state['topics'];
             $this->postsConversionMap = $state['posts'];
             $this->usersConversionMap = $state['users'];
+            unset($state);
 
             $this->isStateRestored = true;
         }
