@@ -39,6 +39,7 @@ min title similar length            1024    (higher = better)
 
 allow duplicate topic titles        enable
 default email direct                disable (prevents email notifications on @mentions)
+disable emails                      enable  (disables all the email notifications)
 ```
 
 You will also need to create an API key to interact with your Discourse forum.

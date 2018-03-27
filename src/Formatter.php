@@ -127,6 +127,11 @@ class Formatter
         // name must not contain consequential dots, dashes or underscores
         $username = preg_replace('/([_.-])+/', '$1', $username);
 
+        // FIXME: restricted usernames from Discourse settings must be used instead
+        if ($username === 'admin') {
+            $username = 'system';
+        }
+
         return $username;
     }
 
