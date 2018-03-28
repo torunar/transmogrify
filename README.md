@@ -21,6 +21,7 @@ rate limit new user create post     0
 auto close topics post count        0
 max topics per day                  900000  (higher = better)
 max topics in first day             900000  (higher = better)
+max replies in first day            900000  (higher = better)
 max post length                     99000   (higher = better)
 
 newuser max replies per topic       99000   (higher = better)

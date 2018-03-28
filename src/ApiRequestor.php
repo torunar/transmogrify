@@ -22,6 +22,9 @@ class ApiRequestor
     /** @var int $batchSize */
     protected $batchSize = 10;
 
+    /** @var int $requestTimeout */
+    protected $requestTimeout = 30;
+
     /**
      * DiscourseApi constructor.
      *
@@ -67,6 +70,7 @@ class ApiRequestor
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SAFE_UPLOAD    => true,
             CURLOPT_CUSTOMREQUEST  => strtoupper($requestMethod),
+            CURLOPT_TIMEOUT        => $this->requestTimeout,
         ]);
 
         if ($requestMethod === 'post'
@@ -77,7 +81,7 @@ class ApiRequestor
 
         $response = curl_exec($ch);
         $errorNumber = curl_errno($ch);
-        $errorMessage = curl_exec($ch);
+        $errorMessage = curl_error($ch);
         curl_close($ch);
 
         $debugData = [
