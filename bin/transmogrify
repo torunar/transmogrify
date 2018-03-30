@@ -13,6 +13,7 @@ try {
     $app = new App($argc, $argv);
     $app->restoreState();
     $exitCode = $app->run();
+    $app->saveState();
 } catch (ApiException $e) {
     $app->getLogger()->dump($e->getMessage(), $e->getData());
     $app->saveState();

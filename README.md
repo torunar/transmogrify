@@ -13,34 +13,35 @@ Before running a tool, the Discourse should be configured to minimise side effec
 Log in into your Discourse administration panel, go to the **Settings** tab and set the following settings accordingly:
 
 ```
-unique posts mins                   0
-rate limit create topic             0
-rate limit create post              0
-rate limit new user create topic    0
-rate limit new user create post     0
-auto close topics post count        0
-max topics per day                  900000  (higher = better)
-max topics in first day             900000  (higher = better)
-max replies in first day            900000  (higher = better)
-max post length                     99000   (higher = better)
+unique posts mins                    0
+rate limit create topic              0
+rate limit create post               0
+rate limit new user create topic     0
+rate limit new user create post      0
+auto close topics post count         0
+max topics per day                   900000  (higher = better)
+max topics in first day              900000  (higher = better)
+max replies in first day             900000  (higher = better)
+max post length                      99000   (higher = better)
+max new accounts per registration ip 900000  (higher = better)
 
-newuser max replies per topic       99000   (higher = better)
-newuser max mentions per post       100     (higher = better)
-newuser max links                   100     (higher = better)
-newuser max images                  100     (higher = better)
-newuser max attachments             5       (higher = better)
-newuser spam host threshold         99000   (higher = better)
+newuser max replies per topic        99000   (higher = better)
+newuser max mentions per post        100     (higher = better)
+newuser max links                    100     (higher = better)
+newuser max images                   100     (higher = better)
+newuser max attachments              5       (higher = better)
+newuser spam host threshold          99000   (higher = better)
 
-min post length                     1       (lower = better)
-min first post length               1       (lower = better)
-body min entropy                    1       (lower = better)
-title min entropy                   1       (lower = better)
-min topic title length              1       (lower = better)
-min title similar length            1024    (higher = better)
+min post length                      1       (lower = better)
+min first post length                1       (lower = better)
+body min entropy                     1       (lower = better)
+title min entropy                    1       (lower = better)
+min topic title length               1       (lower = better)
+min title similar length             1024    (higher = better)
 
-allow duplicate topic titles        enable
-default email direct                disable (prevents email notifications on @mentions)
-disable emails                      enable  (disables all the email notifications)
+allow duplicate topic titles         enable
+default email direct                 disable (prevents email notifications on @mentions)
+disable emails                       enable  (disables all the email notifications)
 ```
 
 You will also need to create an API key to interact with your Discourse forum.

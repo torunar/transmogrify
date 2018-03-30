@@ -155,12 +155,12 @@ class App
                         $topicData = $this->formatter->toTopic($categoryId, $topic, $post, $attachments);
 
                         $respDecoded = null;
-                        if (!isset($this->topicsConversionMap[$post['id']])) {
+                        if (!isset($this->topicsConversionMap[$topic['id']])) {
                             list($respDecoded,) = $this->api->request('posts', $topicData, 'post', $username);
-                            $this->topicsConversionMap[$post['id']] = (int) $respDecoded['topic_id'];
+                            $this->topicsConversionMap[$topic['id']] = (int) $respDecoded['topic_id'];
                         }
 
-                        $topicId = $this->topicsConversionMap[$post['id']];
+                        $topicId = $this->topicsConversionMap[$topic['id']];
 
                         $this->triggerEvent('postTopicCreated', $topic, $topicData, $respDecoded, $topicId);
 
@@ -227,7 +227,7 @@ class App
      */
     protected function getStatePath()
     {
-        return __DIR__ . '/../var/app.stt';
+        return __DIR__ . '/../var/transmogrify.state';
     }
 
     /**
