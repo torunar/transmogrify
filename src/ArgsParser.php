@@ -2,6 +2,8 @@
 
 namespace Transmogrify;
 
+use Exception;
+
 class ArgsParser
 {
     protected $dbHost = 1;
@@ -36,8 +38,11 @@ class ArgsParser
     public function __construct($argc)
     {
         if ($argc < ($this->apiKey + 1)) {
-            throw new \Exception(
-                "Usage:\tphp transmogrify dbHost dbUser dbPassword dbName dbPrefix ipbAddress apiKey [discourseAddress [forumIds [topicsLimit [postsLimit]]]]\n"
+            throw new Exception(
+                'Usage:'
+                . ' php transmogrify dbHost dbUser dbPassword dbName dbPrefix ipbAddress apiKey'
+                . ' [discourseAddress [forumIds [topicsLimit [postsLimit]]]]'
+                . PHP_EOL
             );
         }
     }

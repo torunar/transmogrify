@@ -4,6 +4,9 @@ namespace Transmogrify;
 
 class App
 {
+    /** @var \Transmogrify\ComponentManager $componentManager */
+    protected $componentManager;
+
     /** @var \Transmogrify\Logger $logger */
     protected $logger;
 
@@ -68,9 +71,11 @@ class App
      */
     public function __construct($argc, array $argv = [])
     {
-        $this->logger = new Logger();
+        $this->componentManager = new ComponentManager();
 
-        $this->argsParser = new ArgsParser($argc);
+        $this->logger = $this->componentManager->get('Logger');
+
+        $this->argsParser = $this->componentManager->get('ArgsParser', $argc);
 
         list($this->dbSettings,
             $this->ipbAddress,
@@ -80,13 +85,13 @@ class App
             $this->topicsLimit,
             $this->postsLimit) = $this->argsParser->parse($argv);
 
-        $this->ipb = new Ipb($this->dbSettings, $this->ipbAddress);
+        $this->ipb = $this->componentManager->get('Ipb', $this->dbSettings, $this->ipbAddress);
 
-        $this->api = new ApiRequestor($this->discourseAddress, $this->apiKey);
+        $this->api = $this->componentManager->get('ApiRequestor', $this->discourseAddress, $this->apiKey);
 
-        $this->formatter = new Formatter();
+        $this->formatter = $this->componentManager->get('Formatter');
 
-        $this->eventManager = new EventManager();
+        $this->eventManager = $this->componentManager->get('EventManager');
     }
 
     /**
