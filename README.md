@@ -52,7 +52,7 @@ Log in into your Discourse administration panel, go to the **API** tab and press
 
 Clone the repo:
 ```
-$ git clone https://bitbucket.org/torunar/transmogrify.git
+$ git git@github.com:torunar/transmogrify.git
 ```
 
 Go to the tool folder:
